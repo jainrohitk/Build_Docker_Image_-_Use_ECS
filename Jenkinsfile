@@ -1,21 +1,27 @@
-pipeline {
-  agent any
+node {
+    def app
 
-  // Set any variables here
-  environment {
-    IMAGE_NAME = 'jainrohitk/node'
-    DOCKER_FILE = 'Dockerfile'
-  }
+    stage('Clone repository') {
+        /* Let's make sure we have the repository cloned to our workspace */
 
-  stages {
-
-    // Build the test container  and save it
-    stage('Build test container') {
-      steps {
-        script {
-          def testImage = docker.build($IMAGE_NAME, "-f ${$DOCKER_FILE} .")
-        }
-      }
+        checkout scm
     }
-  }
+
+    stage('Build image') {
+        /* This builds the actual image; synonymous to
+         * docker build on the command line */
+
+        app = docker.build("myawsecr")
+    }
+
+        stage('Push image') {
+        /* Finally, we'll push the image with two tags:
+         * First, the incremental build number from Jenkins
+         * Second, the 'latest' tag.
+         * Pushing multiple tags is cheap, as all the layers are reused. */
+            docker.withRegistry('https://694839757085.dkr.ecr.ap-south-1.amazonaws.com', 'ecr:ap-south-1:demo-ecr-credentials') {
+            app.push("${env.BUILD_NUMBER}")
+            app.push("latest")
+        }
+    }
 }
