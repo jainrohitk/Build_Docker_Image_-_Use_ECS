@@ -28,6 +28,10 @@ node (label: 'Node1') {
 
         app.inside {
             sh 'echo "Tests passed"'
+	    sh 'echo "Hostname & Container id is"`hostname`'
+            sh 'df -kh'
+            sh 'top'
+
         }
     }
 	
