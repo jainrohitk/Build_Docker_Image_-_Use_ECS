@@ -7,6 +7,14 @@ node (label: 'Node1') {
         checkout scm
     }
 
+     stage ('Install Maven') {
+           sh 'mvn install'
+     }
+	 
+    stage ('Compile Stage') {
+          sh 'mvn clean package test'
+    }
+    
     stage('Build image') {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
